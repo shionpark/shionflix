@@ -1,31 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { IMovie, getComingSoon, makeImagePath } from '@/utils';
 
-function ComingSoon() {
-  const [popularMovies, setPopularMovies] = useState<IMovie[]>([]);
+interface IComingResponse {
+  results: IMovie[];
+}
 
-  useEffect(() => {
-    // 비동기 데이터 가져오기
-    getComingSoon()
-      .then((data) => {
-        // 데이터를 받아와서 상태 변수에 저장
-        setPopularMovies(data.results);
-        console.log(data.results);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+function ComingSoon() {
+  const { data, isLoading, isError } = useQuery<IComingResponse>(['coming'], getComingSoon);
+  console.log(data?.results);
 
   return (
     <>
-      <h1>Coming Soon</h1>
-      {popularMovies.map((movie) => (
-        <div key={movie.id}>
-          <img style={{ width: '160px', height: '200px' }} src={makeImagePath(movie.poster_path)} />
-          <h3 key={movie.id}>{movie.original_title}</h3>
-        </div>
-      ))}
+      {isLoading ? (
+        <h1>Loading...</h1>
+      ) : (
+        <>
+          {data?.results?.map((coming) => (
+            <div key={coming.id}>
+              <img
+                style={{ width: '160px', height: '200px' }}
+                src={makeImagePath(coming.poster_path)}
+              />
+              <h3 key={coming.id}>{coming.original_title}</h3>
+            </div>
+          ))}
+        </>
+      )}
     </>
   );
 }
