@@ -24,6 +24,10 @@ export function makeBgPath(image: string) {
   return `https://image.tmdb.org/t/p/original${image}`;
 }
 
+export interface IMovieResponse {
+  results: IMovie[];
+}
+
 export interface IMovie {
   adult: boolean;
   backdrop_path: string;

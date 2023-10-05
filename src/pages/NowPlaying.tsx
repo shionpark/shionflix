@@ -1,11 +1,11 @@
 import React from 'react';
 import { MovieList } from '@/components';
-import { IMovie, getComingSoon } from '@/utils';
+import { getNowPlaying } from '@/utils';
 
 const NowPlaying = () => {
   return (
     <>
-      <MovieList<IMovie> dataKey="comingSoon" fetchData={getComingSoon} />
+      <MovieList dataKey="comingSoon" fetchData={getNowPlaying} />
     </>
   );
 };
