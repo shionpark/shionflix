@@ -1,4 +1,5 @@
 import React from 'react';
+import { Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { IMovie, getNowPlaying, makeImagePath } from '@/utils';
 
@@ -8,7 +9,9 @@ interface INowPlayingResponse {
 
 function NowPlaying() {
   const { data, isLoading, isError } = useQuery<INowPlayingResponse>(['nowPlaying'], getNowPlaying);
-  console.log(data?.results);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentLocation = location.pathname;
 
   return (
     <>
@@ -21,12 +24,14 @@ function NowPlaying() {
               <img
                 style={{ width: '160px', height: '200px' }}
                 src={makeImagePath(nowPlaying.poster_path)}
+                onClick={() => navigate(`${currentLocation}/detail/${nowPlaying.id}`)}
               />
               <h3 key={nowPlaying.id}>{nowPlaying.original_title}</h3>
             </div>
           ))}
         </>
       )}
+      <Outlet />
     </>
   );
 }
