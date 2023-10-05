@@ -14,7 +14,7 @@ const router = createBrowserRouter([
         element: <Home />,
         children: [
           {
-            path: 'detail/:movieId',
+            path: 'movie/:movieId',
             element: <PopularModal />,
           },
         ],
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
         element: <ComingSoon />,
         children: [
           {
-            path: 'detail/:movieId',
+            path: 'movie/:movieId',
             element: <ComingSoonModal />,
           },
         ],
@@ -34,7 +34,7 @@ const router = createBrowserRouter([
         element: <NowPlaying />,
         children: [
           {
-            path: 'detail/:movieId',
+            path: 'movie/:movieId',
             element: <NowPlayingModal />,
           },
         ],

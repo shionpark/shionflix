@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { IMovieResponse, IMovie, makeImagePath } from '@/utils';
 
@@ -12,15 +12,31 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
   const { data, isLoading, isError } = useQuery<IMovieResponse[]>([dataKey], fetchData);
 
   const navigate = useNavigate();
+
   const location = useLocation();
   const currentLocation = location.pathname;
-
   const getDetailPath = (movieId: number) => {
-    return currentLocation === '/' ? `/detail/${movieId}` : `${currentLocation}/detail/${movieId}`;
+    return currentLocation === '/' ? `/movie/${movieId}` : `${currentLocation}/movie/${movieId}`;
   };
+
+  const params = useParams();
+  const isOverlayVisible = params.movieId !== undefined;
 
   return (
     <>
+      {isOverlayVisible ? (
+        <div
+          style={{
+            position: 'fixed',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            opacity: '1',
+          }}
+          onClick={() => navigate(-1)}
+        ></div>
+      ) : null}
       {isLoading && <h2>Loading...</h2>}
       {isError && <h2>{isError}</h2>}
       {!isLoading &&
