@@ -5,11 +5,11 @@ import { IMovieResponse, IMovie, makeImagePath } from '@/utils';
 
 interface IListProps {
   dataKey: string;
-  fetchData: () => Promise<[]>;
+  fetchData: () => Promise<IMovieResponse>;
 }
 
 export function MovieList({ dataKey, fetchData }: IListProps) {
-  const { data, isLoading, isError } = useQuery<IMovieResponse[]>([dataKey], fetchData);
+  const { data, isLoading, isError } = useQuery<IMovieResponse>([dataKey], fetchData);
 
   const navigate = useNavigate();
 
