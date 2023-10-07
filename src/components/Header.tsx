@@ -37,11 +37,7 @@ function Header() {
         </li>
       </ul>
       <form onSubmit={handleSubmit(onValid)}>
-        <input
-          {...register('keyword', { required: '필수 항목입니다.' })}
-          type="text"
-          placeholder="search"
-        />
+        <input {...register('keyword')} placeholder="search" />
         <button>Click</button>
       </form>
       <span>{errors?.keyword?.message}</span>

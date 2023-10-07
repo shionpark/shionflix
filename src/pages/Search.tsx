@@ -32,7 +32,9 @@ const Search = () => {
               src={makeImagePath(movie.poster_path)}
               onClick={() => navigate(getDetailPath(movie.id))}
             />
-            <h1 key={index}>{movie.title}</h1>
+            <h1 key={index} style={{ color: 'red' }}>
+              {movie.title}
+            </h1>
           </>
         ))}
     </div>
