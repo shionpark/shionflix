@@ -2,7 +2,6 @@ import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
 import { ComingSoon, Home, NowPlaying } from '@/pages';
-import { ComingSoonModal, NowPlayingModal, PopularModal } from '@/components/Modals';
 
 const router = createBrowserRouter([
   {
@@ -15,7 +14,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'movie/:movieId',
-            element: <PopularModal />,
+            element: <Home />,
           },
         ],
       },
@@ -25,7 +24,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'movie/:movieId',
-            element: <ComingSoonModal />,
+            element: <ComingSoon />,
           },
         ],
       },
@@ -35,7 +34,7 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'movie/:movieId',
-            element: <NowPlayingModal />,
+            element: <NowPlaying />,
           },
         ],
       },
