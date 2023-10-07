@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '@/App';
-import { ComingSoon, Home, NowPlaying } from '@/pages';
+import { ComingSoon, Home, NowPlaying, Search } from '@/pages';
 
 const router = createBrowserRouter([
   {
@@ -15,6 +15,10 @@ const router = createBrowserRouter([
           {
             path: 'movie/:movieId',
             element: <Home />,
+          },
+          {
+            path: 'search',
+            element: <Search />,
           },
         ],
       },
