@@ -1,30 +1,17 @@
 import React from 'react';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { IMovieResponse, IMovie, makeImagePath } from '@/utils';
+import { Outlet, useNavigate } from 'react-router-dom';
+
+import { useGetMovies } from '@/hooks';
+import { IListProps } from '@/hooks/useGetMovies';
+import { IMovie, makeImagePath } from '@/utils';
 import { MovieDetail } from '.';
 
-interface IListProps {
-  dataKey: string;
-  fetchData: () => Promise<IMovieResponse>;
-}
-
 export function MovieList({ dataKey, fetchData }: IListProps) {
-  const { data, isLoading, isError } = useQuery<IMovieResponse>([dataKey], fetchData);
-
+  const { data, isLoading, isError, getDetailPath, isOverlayVisible, clickedMovie } = useGetMovies({
+    dataKey,
+    fetchData,
+  });
   const navigate = useNavigate();
-
-  const location = useLocation();
-  const currentLocation = location.pathname;
-  const getDetailPath = (movieId: number) => {
-    return currentLocation === '/' ? `/movie/${movieId}` : `${currentLocation}/movie/${movieId}`;
-  };
-
-  const params = useParams();
-  const isOverlayVisible = params.movieId !== undefined;
-  const clickedMovie =
-    params.movieId && data?.results.find((moive: IMovie) => String(moive.id) === params.movieId);
-
   return (
     <>
       {isOverlayVisible ? (
