@@ -36,6 +36,17 @@ const boxVariants = {
   },
 };
 
+const infoVariants = {
+  hover: {
+    opacity: 1,
+    transition: {
+      delay: 0.5,
+      duaration: 0.1,
+      type: 'tween',
+    },
+  },
+};
+
 export function MovieList({ dataKey, fetchData }: IListProps) {
   const { data, isLoading, isError, getDetailPath, isOverlayVisible, clickedMovie } = useGetMovies({
     dataKey,
@@ -47,7 +58,7 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
   const SLIDE_OFFSET = 6;
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
-  const incraseIndex = () => {
+  const increaseIndex = () => {
     if (data) {
       if (leaving) return;
       toggleLeaving();
@@ -64,7 +75,7 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
       {isError && <Loader>{isError}</Loader>}
       {!isLoading && !isError && (
         <>
-          <Banner onClick={incraseIndex} bgPhoto={makeBgPath(topMovie?.backdrop_path || '')}>
+          <Banner onClick={increaseIndex} bgPhoto={makeBgPath(topMovie?.backdrop_path || '')}>
             <Title>{topMovie?.title}</Title>
             <Overview>{topMovie?.overview}</Overview>
           </Banner>
@@ -91,8 +102,8 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
                       bgPhoto={makeImagePath(movie.poster_path || '')}
                       onClick={() => navigate(getDetailPath(movie.id))}
                     >
-                      <Info>
-                        <h3 key={movie.id}>{movie.original_title}</h3>
+                      <Info variants={infoVariants}>
+                        <h4 key={movie.id}>{movie.original_title}</h4>
                       </Info>
                     </Box>
                   ))}
@@ -184,6 +195,16 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   }
 `;
 
-const Info = styled.div``;
-
+const Info = styled(motion.div)`
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  h4 {
+    text-align: center;
+    font-size: 18px;
+  }
+`;
 export default MovieList;
