@@ -19,10 +19,6 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: 'search',
-        element: <Search />,
-      },
-      {
         path: '/coming-soon',
         element: <ComingSoon />,
         children: [
@@ -41,6 +37,10 @@ const router = createBrowserRouter([
             element: <NowPlaying />,
           },
         ],
+      },
+      {
+        path: 'search',
+        element: <Search />,
       },
     ],
   },

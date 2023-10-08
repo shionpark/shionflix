@@ -13,8 +13,11 @@ const Search = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentLocation = location.pathname;
+  console.log(currentLocation);
   const getDetailPath = (movieId: number) => {
-    return currentLocation === '/' ? `/movie/${movieId}` : `${currentLocation}/movie/${movieId}`;
+    return currentLocation === '/search'
+      ? `/movie/${movieId}`
+      : `${currentLocation}/movie/${movieId}`;
   };
 
   return (
