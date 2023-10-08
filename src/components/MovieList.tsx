@@ -7,6 +7,7 @@ import { IMovie, makeBgPath, makeImagePath } from '@/utils';
 import { MovieDetail } from '.';
 
 import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
 export function MovieList({ dataKey, fetchData }: IListProps) {
   const { data, isLoading, isError, getDetailPath, isOverlayVisible, clickedMovie } = useGetMovies({
@@ -25,18 +26,21 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
             <Title>{topMovie?.title}</Title>
             <Overview>{topMovie?.overview}</Overview>
           </Banner>
-          <div>
-            {data?.results?.map((movie: IMovie) => (
-              <div key={movie.id}>
-                <img
-                  style={{ width: '160px', height: '200px' }}
-                  src={makeImagePath(movie.poster_path)}
+          <Slider>
+            <Row>
+              {data?.results?.slice(0, 6).map((movie: IMovie) => (
+                <Box
+                  key={movie.id}
+                  bgPhoto={makeImagePath(movie.poster_path || '')}
                   onClick={() => navigate(getDetailPath(movie.id))}
-                />
-                <h3 key={movie.id}>{movie.original_title}</h3>
-              </div>
-            ))}
-          </div>
+                >
+                  <Info>
+                    <h3 key={movie.id}>{movie.original_title}</h3>
+                  </Info>
+                </Box>
+              ))}
+            </Row>
+          </Slider>
         </>
       )}
       {isOverlayVisible ? (
@@ -77,10 +81,9 @@ const Banner = styled.div<{ bgPhoto: string }>`
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  /* background-color: red; */
-  background-size: cover;
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
     url(${(props) => props.bgPhoto});
+  background-size: cover;
 `;
 
 const Title = styled.h2`
@@ -92,5 +95,29 @@ const Overview = styled.p`
   font-size: 26px;
   width: 50%;
 `;
+
+const Slider = styled.div`
+  position: relative;
+  top: -100px;
+`;
+
+const Row = styled(motion.div)`
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(6, 1fr);
+  position: absolute;
+  width: 100%;
+`;
+
+const Box = styled(motion.div)<{ bgPhoto: string }>`
+  background-color: white;
+  background-image: url(${(props) => props.bgPhoto});
+  background-size: cover; // 이미지 박스에 맞추기
+  background-position: center center; // 이미지 박스 중앙
+  height: 200px;
+  cursor: pointer;
+`;
+
+const Info = styled.div``;
 
 export default MovieList;
