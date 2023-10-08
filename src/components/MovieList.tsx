@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { useGetMovies } from '@/hooks';
@@ -7,7 +7,19 @@ import { IMovie, makeBgPath, makeImagePath } from '@/utils';
 import { MovieDetail } from '.';
 
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const rowVariants = {
+  hidden: {
+    x: window.outerWidth + 10, // 처음과 끝을 조금 떼어주기 위해 -10 (아니면 슬라이드 바뀔 때 서로 붙어있음)
+  },
+  visible: {
+    x: 0,
+  },
+  exit: {
+    x: -window.outerWidth - 10,
+  },
+};
 
 export function MovieList({ dataKey, fetchData }: IListProps) {
   const { data, isLoading, isError, getDetailPath, isOverlayVisible, clickedMovie } = useGetMovies({
@@ -16,30 +28,59 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
   });
   const navigate = useNavigate();
   const topMovie = data?.results[0];
+
+  // Index 시스템
+  const SLIDE_OFFSET = 6;
+  const [index, setIndex] = useState(0); // 인덱스는 0부터 시작
+  // 버그 수정 :
+  const [leaving, setLeaving] = useState(false);
+  const incraseIndex = () => {
+    if (data) {
+      if (leaving) return; // 사용자가 한번 클릭하면
+      toggleLeaving();
+      const TOTAL_MOVIES = data.results.length - 1;
+      const MAX_INDEX = Math.floor(TOTAL_MOVIES / SLIDE_OFFSET) - 1; // page가 0에서 시작하니까 1 감소
+      setIndex((prev) => (prev === MAX_INDEX ? 0 : prev + 1));
+    }
+  };
+  const toggleLeaving = () => setLeaving((prev) => !prev);
+
   return (
     <Wrapper>
       {isLoading && <Loader>Loading...</Loader>}
       {isError && <Loader>{isError}</Loader>}
       {!isLoading && !isError && (
         <>
-          <Banner bgPhoto={makeBgPath(topMovie?.backdrop_path || '')}>
+          <Banner onClick={incraseIndex} bgPhoto={makeBgPath(topMovie?.backdrop_path || '')}>
             <Title>{topMovie?.title}</Title>
             <Overview>{topMovie?.overview}</Overview>
           </Banner>
           <Slider>
-            <Row>
-              {data?.results?.slice(0, 6).map((movie: IMovie) => (
-                <Box
-                  key={movie.id}
-                  bgPhoto={makeImagePath(movie.poster_path || '')}
-                  onClick={() => navigate(getDetailPath(movie.id))}
-                >
-                  <Info>
-                    <h3 key={movie.id}>{movie.original_title}</h3>
-                  </Info>
-                </Box>
-              ))}
-            </Row>
+            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+              <Row
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                transition={{ type: 'tween', duration: 1 }} // 튕기는 거 없애줌 spring 아니고 linear
+                key={index}
+              >
+                {data?.results
+                  .slice(1)
+                  .slice(SLIDE_OFFSET * index, SLIDE_OFFSET * index + SLIDE_OFFSET)
+                  .map((movie: IMovie) => (
+                    <Box
+                      key={movie.id}
+                      bgPhoto={makeImagePath(movie.poster_path || '')}
+                      onClick={() => navigate(getDetailPath(movie.id))}
+                    >
+                      <Info>
+                        <h3 key={movie.id}>{movie.original_title}</h3>
+                      </Info>
+                    </Box>
+                  ))}
+              </Row>
+            </AnimatePresence>
           </Slider>
         </>
       )}
@@ -103,8 +144,8 @@ const Slider = styled.div`
 
 const Row = styled(motion.div)`
   display: grid;
-  gap: 5px;
   grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
   position: absolute;
   width: 100%;
 `;
