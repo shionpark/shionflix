@@ -69,6 +69,9 @@ a {
   text-decoration:none;
   color:inherit;
 }
+input:focus {
+  outline: none;
+}
 `;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

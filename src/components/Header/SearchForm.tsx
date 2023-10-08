@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
@@ -12,6 +12,8 @@ const SearchForm = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const { register, handleSubmit } = useForm<IForm>();
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
   const onValid = (data: IForm) => {
     navigate(`/search?keyword=${data.keyword}`, { state: { keyword: data.keyword } });
   };
@@ -27,6 +29,22 @@ const SearchForm = () => {
     }
     setSearchOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+        inputAnimation.start({
+          scaleX: 0,
+        });
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [inputAnimation]);
 
   return (
     <Search onSubmit={handleSubmit(onValid)}>
@@ -50,6 +68,7 @@ const SearchForm = () => {
         initial={{ scaleX: 0 }}
         transition={{ type: 'linear' }}
         placeholder="Search title"
+        ref={inputRef}
       />
     </Search>
   );
