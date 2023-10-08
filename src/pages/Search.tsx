@@ -8,10 +8,7 @@ const Search = () => {
     state: { keyword },
   } = useLocation();
 
-  console.log('search : ', keyword);
-
   const { data, isLoading, isError } = useQuery<IMovieResponse>(['popular'], getPopular);
-  console.log(data);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -26,7 +23,7 @@ const Search = () => {
       {data?.results
         .filter((movie) => (keyword ? movie.title.toLowerCase().includes(keyword) : true))
         .map((movie, index) => (
-          <>
+          <div key={index}>
             <img
               style={{ width: '160px', height: '200px' }}
               src={makeImagePath(movie.poster_path)}
@@ -35,7 +32,7 @@ const Search = () => {
             <h1 key={index} style={{ color: 'red' }}>
               {movie.title}
             </h1>
-          </>
+          </div>
         ))}
     </div>
   );

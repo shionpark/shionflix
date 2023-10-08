@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useMatch, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
-import { motion, Variants, useAnimation } from 'framer-motion';
+import { motion, Variants, useAnimation, useScroll, useMotionValueEvent } from 'framer-motion';
 interface IForm {
   keyword: string;
 }
@@ -13,6 +13,8 @@ function Header() {
   const comingMatch = useMatch('/coming-soon');
   const nowMatch = useMatch('/now-playing');
   const inputAnimation = useAnimation();
+  const navAnimation = useAnimation();
+  const { scrollYProgress } = useScroll();
 
   const toggleSearch = () => {
     if (searchOpen) {
@@ -25,11 +27,15 @@ function Header() {
     setSearchOpen((prev) => !prev);
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IForm>();
+  useMotionValueEvent(scrollYProgress, 'change', (y) => {
+    if (y < 0.1) {
+      navAnimation.start('top');
+    } else {
+      navAnimation.start('scroll');
+    }
+  });
+
+  const { register, handleSubmit } = useForm<IForm>();
 
   const navigate = useNavigate();
 
@@ -38,7 +44,7 @@ function Header() {
   };
 
   return (
-    <Nav>
+    <Nav variants={navVariants} animate={navAnimation} initial={'top'}>
       <Col>
         <Logo
           variants={logoVariants}
@@ -89,8 +95,15 @@ function Header() {
     </Nav>
   );
 }
-
-const Nav = styled.nav`
+const navVariants = {
+  top: {
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+  },
+  scroll: {
+    backgroundColor: 'rgba(0, 0, 0, 1)',
+  },
+};
+const Nav = styled(motion.nav)`
   display: flex;
   justify-content: space-between;
   align-items: center;
