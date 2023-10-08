@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const rowVariants = {
   hidden: {
-    x: window.outerWidth + 5, // 처음과 끝을 조금 떼어주기 위해 -5 (아니면 슬라이드 바뀔 때 서로 붙어있음)
+    x: window.outerWidth + 5,
   },
   visible: {
     x: 0,
@@ -54,6 +54,10 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
   });
   const navigate = useNavigate();
   const topMovie = data?.results[0];
+
+  const handleMovieClick = (movieId: number) => {
+    navigate(getDetailPath(movieId));
+  };
 
   const SLIDE_OFFSET = 6;
   const [index, setIndex] = useState(0);
@@ -100,7 +104,7 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
                       variants={boxVariants}
                       transition={{ type: 'tween' }}
                       bgPhoto={makeImagePath(movie.poster_path || '')}
-                      onClick={() => navigate(getDetailPath(movie.id))}
+                      onClick={() => handleMovieClick(movie.id)}
                     >
                       <Info variants={infoVariants}>
                         <h4 key={movie.id}>{movie.original_title}</h4>
@@ -112,26 +116,69 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
           </Slider>
         </>
       )}
-      {isOverlayVisible ? (
-        <div
-          style={{
-            position: 'fixed',
-            top: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            opacity: '1',
-          }}
-          onClick={() => navigate(-1)}
-        >
-          overlay
-          <MovieDetail movie={clickedMovie as IMovie} />
-        </div>
-      ) : null}
-      <Outlet />
+      <AnimatePresence>
+        {isOverlayVisible ? (
+          <>
+            <Overlay exit={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => navigate(-1)} />
+            <BigMovie>
+              {clickedMovie && (
+                <>
+                  <BigCover bgImage={makeImagePath(clickedMovie.backdrop_path || '')}></BigCover>
+                  <BigTitle>{clickedMovie.title}</BigTitle>
+                  <BigOverview>{clickedMovie.overview}</BigOverview>
+                </>
+              )}
+            </BigMovie>
+          </>
+        ) : null}
+      </AnimatePresence>
     </Wrapper>
   );
 }
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+const BigMovie = styled(motion.div)`
+  position: fixed;
+  width: 60vw;
+  height: 70vh;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: 15px;
+  overflow: hidden;
+`;
+
+const BigCover = styled.div<{ bgImage: string }>`
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
+  height: 400px;
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
+    url(${(props) => props.bgImage});
+`;
+
+const BigTitle = styled.h3`
+  padding: 20px;
+  font-size: 46px;
+  position: relative;
+  top: -80px;
+`;
+
+const BigOverview = styled.p`
+  padding: 20px;
+  position: relative;
+  top: -80px;
+`;
 
 const Wrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.8);
@@ -182,11 +229,10 @@ const Row = styled(motion.div)`
 const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-color: white;
   background-image: url(${(props) => props.bgPhoto});
-  background-size: cover; // 이미지 박스에 맞추기
-  background-position: center center; // 이미지 박스 중앙
+  background-size: cover;
+  background-position: center center;
   height: 200px;
   cursor: pointer;
-  // scale up 화면 밖으로 넘어가지 않도록
   &:first-child {
     transform-origin: center left;
   }
