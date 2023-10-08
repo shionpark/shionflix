@@ -11,13 +11,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const rowVariants = {
   hidden: {
-    x: window.outerWidth + 10, // 처음과 끝을 조금 떼어주기 위해 -10 (아니면 슬라이드 바뀔 때 서로 붙어있음)
+    x: window.outerWidth + 5, // 처음과 끝을 조금 떼어주기 위해 -5 (아니면 슬라이드 바뀔 때 서로 붙어있음)
   },
   visible: {
     x: 0,
   },
   exit: {
-    x: -window.outerWidth - 10,
+    x: -window.outerWidth - 5,
+  },
+};
+
+const boxVariants = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.3,
+    y: -80,
+    transition: {
+      delay: 0.5,
+      duaration: 0.1,
+      type: 'tween',
+    },
   },
 };
 
@@ -29,17 +44,15 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
   const navigate = useNavigate();
   const topMovie = data?.results[0];
 
-  // Index 시스템
   const SLIDE_OFFSET = 6;
-  const [index, setIndex] = useState(0); // 인덱스는 0부터 시작
-  // 버그 수정 :
+  const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const incraseIndex = () => {
     if (data) {
-      if (leaving) return; // 사용자가 한번 클릭하면
+      if (leaving) return;
       toggleLeaving();
       const TOTAL_MOVIES = data.results.length - 1;
-      const MAX_INDEX = Math.floor(TOTAL_MOVIES / SLIDE_OFFSET) - 1; // page가 0에서 시작하니까 1 감소
+      const MAX_INDEX = Math.floor(TOTAL_MOVIES / SLIDE_OFFSET) - 1;
       setIndex((prev) => (prev === MAX_INDEX ? 0 : prev + 1));
     }
   };
@@ -71,6 +84,10 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
                   .map((movie: IMovie) => (
                     <Box
                       key={movie.id}
+                      whileHover="hover"
+                      initial="normal"
+                      variants={boxVariants}
+                      transition={{ type: 'tween' }}
                       bgPhoto={makeImagePath(movie.poster_path || '')}
                       onClick={() => navigate(getDetailPath(movie.id))}
                     >
@@ -107,6 +124,7 @@ export function MovieList({ dataKey, fetchData }: IListProps) {
 
 const Wrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.8);
+  padding-bottom: 200px;
 `;
 
 const Loader = styled.div`
@@ -157,6 +175,13 @@ const Box = styled(motion.div)<{ bgPhoto: string }>`
   background-position: center center; // 이미지 박스 중앙
   height: 200px;
   cursor: pointer;
+  // scale up 화면 밖으로 넘어가지 않도록
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
 
 const Info = styled.div``;
